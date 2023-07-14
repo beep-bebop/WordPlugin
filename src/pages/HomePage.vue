@@ -132,6 +132,12 @@
         >
           设置
         </el-button>
+        <el-button
+          type="primary"
+          @click="debug"
+        >
+          调试
+        </el-button>
       </el-button-group>
     </el-row>
   </div>
@@ -346,5 +352,10 @@ async function handleCopyClicked () {
 // 跳转到设置页面
 async function settings () {
   router.push('/settings')
+}
+
+// 跳转到调试页面
+async function debug () {
+  router.push('/debug')
 }
 </script>
