@@ -1,9 +1,9 @@
 import { Ref } from 'vue'
 
-function insertResult (
+export const insertResult = (
   result: Ref<string>,
   insertType: Ref<string>
-): void {
+) => {
   const paragraph = result.value.split('\n')
   Word.run(async (context) => {
     const range = context.document.getSelection()
@@ -15,6 +15,6 @@ function insertResult (
   })
 }
 
-export default {
-  insertResult
-}
+// export default {
+//   insertResult
+// }

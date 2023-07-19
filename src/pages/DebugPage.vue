@@ -82,10 +82,12 @@ const input = ref('')
 const output = ref('')
 const router = useRouter()
 const loading = ref(false)
+const history = ref<any>([])
 
 async function template () {
   // 获取选中的文本
-  const selectedText = 'hello'
+  const selectedText = input.value
+  console.log(selectedText)
   loading.value = true
   // 根据任务类型生成系统消息和用户消息
 
@@ -93,7 +95,7 @@ async function template () {
     const fetchChatAPIOnce = async () => {
       const res = await chat({
         question: selectedText,
-        history: []
+        history: history.value
       })
       output.value = res.data.response ? res.data.response : res.data.response.text
     }
@@ -104,6 +106,7 @@ async function template () {
     }
   } finally {
     loading.value = false
+    history.value.push([selectedText, output.value])
   }
 }
 
@@ -120,6 +123,7 @@ function sendRequest () {
 
 function backToHome () {
   router.push('/')
+  history.value = []
 }
 
 </script>

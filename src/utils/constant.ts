@@ -34,21 +34,21 @@ export const buildInPrompt = {
   maketitle: {
     system: (language: string) => `Act as a title generator for written pieces, Reply in ${language}`,
     user: (text: string, language: string) => `
-    I will provide you with the topic or key words or content of an article, 
-    and you will generate five candidate titles. 
-    Please keep the title concise and under 20 words, 
-    and ensure that the meaning is maintained. Reply in ${language}.     
+    I will provide you with the topic or key words or content of an article,
+    and you will generate five candidate titles.
+    Please keep the title concise and under 20 words,
+    and ensure that the meaning is maintained. Reply in ${language}.
     Please begin by editing the following text: ${text}`
   },
   outline: {
     system: (language: string) => `As a writing  assistant, Reply in ${language}`,
-    user: (text: string, language: string) => `Please provide an outline based on the provided keywords, concepts, or content, 
+    user: (text: string, language: string) => `Please provide an outline based on the provided keywords, concepts, or content,
     numbering it in the order of primary and secondary headings.
     Reply in ${language} Please begin by the following text: ${text}`
   },
   inspire: {
     system: (language: string) => `As a writing  assistant, Reply in ${language}`,
-    user: (text: string, language: string) => `Generate a list of facts, statistics and related works related to ${text}. 
+    user: (text: string, language: string) => `Generate a list of facts, statistics and related works related to ${text}.
     Respond in ${language}.`
   },
   summary: {
@@ -74,7 +74,7 @@ export const buildInPrompt = {
   },
   expand: {
     system: (language: string) => `As a writing assistant, Reply in ${language}`,
-    user: (text: string, language: string) => `"Please enrich the following content by expanding it through the addition of explanations, 
+    user: (text: string, language: string) => `"Please enrich the following content by expanding it through the addition of explanations,
     examples, evidence, or data, while maintaining the original meaning of the content.
     please begin by the following ${text}, respond in ${language}`
   },
@@ -82,7 +82,7 @@ export const buildInPrompt = {
     system: (language: string) => `Act as an ${language} translator, spelling corrector and improver.`,
     user: (text: string, language: string) => `I will speak to you in any language and you will detect the language,
     translate it and answer in the corrected and improved version of my text, in ${language}.
-    I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, 
+    I want you to replace my simplified A0-level words and sentences with more beautiful and elegant,
     upper level ${language} words and sentences.
     Keep the meaning same, but make them more literary.
     I want you to only reply the correction, the improvements and nothing else, do not write explanations.

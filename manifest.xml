@@ -16,8 +16,8 @@
   <ProviderName>Kuingsmile</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <!-- The display name of your add-in. Used on the store and various places of the Office UI such as the add-ins dialog. -->
-  <DisplayName DefaultValue="Word GPT Plus" />
-  <Description DefaultValue="A chatGPT add in for Word"/>
+  <DisplayName DefaultValue="写作助手" />
+  <Description DefaultValue="AI add in for Word"/>
 
   <!-- Icon for your add-in. Used on installation screens and the add-ins dialog. -->
   <IconUrl DefaultValue="http://localhost:3000/assets/icon-32.png" />
@@ -131,8 +131,8 @@
       <!-- ShortStrings max characters==125. -->
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="Get started with chatGPT!" />
-        <bt:String id="CommandsGroup.Label" DefaultValue="GPT" />
-        <bt:String id="TaskpaneButton.Label" DefaultValue="GPT Plus" />
+        <bt:String id="CommandsGroup.Label" DefaultValue="插件" />
+        <bt:String id="TaskpaneButton.Label" DefaultValue="写作助手" />
       </bt:ShortStrings>
       <!-- LongStrings max characters==250. -->
       <bt:LongStrings>

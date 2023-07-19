@@ -147,7 +147,8 @@
 import { onBeforeMount, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import API from '@/api'
+import { chat } from '@/api/chat'
+import { insertResult } from '@/api/common'
 import {
   localStorageKey,
   buildInPrompt
@@ -156,8 +157,8 @@ import {
 const {
   replyLanguage: replyLanguageKey,
   localLanguage: localLanguageKey,
-  translateLang: translateLanguageKey,
-  apiKey: apiKeyKey,
+  translateLanguage: translateLanguageKey,
+  // apiKey: apiKeyKey,
   temperature: temperatureKey,
   maxTokens: maxTokensKey,
   model: modelKey,
@@ -166,7 +167,7 @@ const {
 } = localStorageKey
 
 // 变量定义
-const apiKey = ref('')
+// const apiKey = ref('')
 const localLanguage = ref('en')
 const replyLanguage = ref('English')
 const translateLanguage = ref('English')
@@ -180,6 +181,7 @@ const router = useRouter()
 const historyDialog = ref<any[]>([])
 const errorIssue = ref(false)
 const insertType = ref('replace')
+const searchText = ref('')
 
 const translatelangList = [
   {
@@ -201,9 +203,9 @@ function handleTranslateLangChange (val: string) {
 // 在组件挂载之前执行的逻辑
 onBeforeMount(async () => {
   // 从本地存储中获取设置的值，如果不存在则使用默认值
-  replyLanguage.value = localStorage.getItem(replyLanguageKey) || 'English'
-  localLanguage.value = localStorage.getItem(localLanguageKey) || 'en'
-  apiKey.value = localStorage.getItem(apiKeyKey) || ''
+  replyLanguage.value = localStorage.getItem(replyLanguageKey) || '中文'
+  localLanguage.value = localStorage.getItem(localLanguageKey) || 'zh-cn'
+  // apiKey.value = localStorage.getItem(apiKeyKey) || ''
   temperature.value = Number(localStorage.getItem(temperatureKey)) || 0.7
   maxTokens.value = Number(localStorage.getItem(maxTokensKey)) || 800
   model.value = localStorage.getItem(modelKey) || 'gpt-3.5-turbo'
@@ -216,6 +218,7 @@ const getSelectedText = async () => {
     const range = context.document.getSelection()
     range.load('text')
     await context.sync()
+    console.log('选中' + range.text)
     return range.text
   })
 }
@@ -235,14 +238,12 @@ async function template (taskType: keyof typeof buildInPrompt) {
   }
   const systemMessage = buildInPrompt[taskType].system(replyLanguage.value)
   const userMessage = buildInPrompt[taskType].user(selectedText, replyLanguage.value)
-
-  if (!apiKey.value) {
-    ElMessage.error('Set API Key or Access Token first')
-    return
-  }
-
-  // 创建配置对象
-  const config = API.official.setConfig(apiKey.value, basePath.value)
+  console.log(systemMessage)
+  console.log(userMessage)
+  // if (!apiKey.value) {
+  //   ElMessage.error('Set API Key or Access Token first')
+  //   return
+  // }
 
   // 构建对话历史
   historyDialog.value = [
@@ -250,23 +251,40 @@ async function template (taskType: keyof typeof buildInPrompt) {
     { role: 'user', content: userMessage }
   ]
 
+  // try {
+  //   // 调用API方法进行聊天交互
+  //   await API.official.createChatCompletionStream(
+  //     historyDialog.value,
+  //     previewText,
+  //     historyDialog,
+  //     errorIssue,
+  //     loading,
+  //     maxTokens.value,
+  //     temperature.value,
+  //     model.value
+  //   )
+  // } catch (error) {
+  //   previewText.value = String(error)
+  //   errorIssue.value = true
+  //   console.error(error)
+  // }
+  // here is add by me, and history is not available for now
   try {
-    // 调用API方法进行聊天交互
-    await API.official.createChatCompletionStream(
-      config,
-      historyDialog.value,
-      previewText,
-      historyDialog,
-      errorIssue,
-      loading,
-      maxTokens.value,
-      temperature.value,
-      model.value
-    )
-  } catch (error) {
+    const fetchChatAPIOnce = async () => {
+      const res = await chat({
+        question: systemMessage + userMessage,
+        history: []
+      })
+      previewText.value = res.data.response ? res.data.response : res.data.response.text
+    }
+    await fetchChatAPIOnce()
+  } catch (error: any) {
     previewText.value = String(error)
     errorIssue.value = true
     console.error(error)
+  } finally {
+    loading.value = false
+    // history.value.push([selectedText, output.value])
   }
 
   if (errorIssue.value) {
@@ -274,65 +292,114 @@ async function template (taskType: keyof typeof buildInPrompt) {
   }
 }
 
-// 检查API Key是否存在的方法
-function checkApiKey () {
-  if (!apiKey.value) {
-    ElMessage.error('Set API Key or Access Token first')
-    return false
-  }
-  return true
-}
+// stream chat 实现打字机效果
+// async function template (taskType: keyof typeof buildInPrompt) {
+//   // 获取选中的文本
+//   const selectedText = await getSelectedText()
+//   if (selectedText === '') {
+//     ElMessage.warning('未选中任何文本')
+//     return
+//   }
+//   loading.value = true
+//   // 根据任务类型生成系统消息和用户消息
+//   if (taskType === 'translate') {
+//     replyLanguage.value = translateLanguage.value
+//   }
+//   const systemMessage = buildInPrompt[taskType].system(replyLanguage.value)
+//   const userMessage = buildInPrompt[taskType].user(selectedText, replyLanguage.value)
+//   console.log(systemMessage)
+//   console.log(userMessage)
 
-// 调用模板方法进行续写
+//   // 构建对话历史
+//   historyDialog.value = [
+//     { role: 'system', content: systemMessage },
+//     { role: 'user', content: userMessage }
+//   ]
+
+//   try {
+//     const socket = new WebSocket('ws://localhost:7861/local_doc_qa/stream-chat')
+//     socket.onopen = () => {
+//       socket.send(JSON.stringify({
+//         question: systemMessage + userMessage,
+//         history: [],
+//         knowledge_base_id: 'kb1'
+//       }))
+//     }
+//     socket.onmessage = (event) => {
+//       const data = JSON.parse(event.data)
+//       if (data.flag === 'start') {
+//         previewText.value = ''
+//       } else if (data.flag === 'end') {
+//         previewText.value += data.sources_documents.join('')
+//       } else {
+//         previewText.value += data
+//       }
+//     }
+//   } catch (error: any) {
+//     previewText.value = String(error)
+//     errorIssue.value = true
+//     console.error(error)
+//   } finally {
+//     loading.value = false
+//     // history.value.push([selectedText, output.value])
+//   }
+
+//   if (errorIssue.value) {
+//     ElMessage.error('Something is wrong')
+//   }
+// }
+
+// // 检查API Key是否存在的方法
+// function checkApiKey () {
+//   if (!apiKey.value) {
+//     ElMessage.error('Set API Key or Access Token first')
+//     return false
+//   }
+//   return true
+// }
+
+// 调用模板方法进行标题生成
 async function makeTitle () {
-  if (!checkApiKey()) return
-  template('maketitle')
+  return template('maketitle')
 }
 
 // 调用模板方法进行大纲撰写
 async function outline () {
-  if (!checkApiKey()) return
-  template('outline')
+  return template('outline')
 }
 
 // 调用模板方法列出可能用到的素材
 async function inspire () {
-  if (!checkApiKey()) return
-  template('inspire')
+  return template('inspire')
 }
 
 // 调用模板方法进行摘要生成
 async function summarize () {
-  if (!checkApiKey()) return
-  template('summary')
+  return template('summary')
 }
 
 // 调用模板方法进行文稿润色
 async function polish () {
-  if (!checkApiKey()) return
-  template('polish')
+  return template('polish')
 }
 
 // 调用模板方法进行翻译
 async function translate () {
-  if (!checkApiKey()) return
-  template('translate')
+  return template('translate')
 }
 
 // 调用模板方法进行续写
 async function continueWriting () {
-  if (!checkApiKey()) return
-  template('continuewriting')
+  return template('continueWriting')
 }
 
 // 调用模板方法进行续写
 async function expand () {
-  if (!checkApiKey()) return
-  template('expand')
+  return template('expand')
 }
 
 async function handleInsertClicked () {
-  API.common.insertResult(previewText, 'end')
+  insertResult(previewText, ref('end'))
 }
 
 async function handleCopyClicked () {

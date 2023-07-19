@@ -8,8 +8,8 @@ const instance = axios.create({
   baseURL: '/api',
   headers: {
     'Content-Type': 'application/json;charset=UTF-8'
-  },
-  timeout: 5000
+  }
+  // timeout: 5000
 })
 // const message = useMessage()
 instance.interceptors.response.use(
