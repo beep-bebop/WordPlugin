@@ -273,7 +273,7 @@ async function template (taskType: keyof typeof buildInPrompt) {
     const fetchChatAPIOnce = async () => {
       const res = await chat({
         question: systemMessage + userMessage,
-        history: []
+        history: [['-', '-']]
       })
       previewText.value = res.data.response ? res.data.response : res.data.response.text
     }

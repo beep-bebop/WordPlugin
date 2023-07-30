@@ -3,11 +3,14 @@ import App from './App.vue'
 import { i18n } from './i18n'
 import router from './router'
 import ElementUI from 'element-plus'
+import { createPinia } from 'pinia'
+
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import 'element-plus/dist/index.css'
 
 window.Office.onReady(() => {
   const app = createApp(App)
+  const pinia = createPinia()
   for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
   }
@@ -35,5 +38,6 @@ window.Office.onReady(() => {
   app.use(i18n)
   app.use(router)
   app.use(ElementUI)
+  app.use(pinia)
   app.mount('#app')
 })

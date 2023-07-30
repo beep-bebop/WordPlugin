@@ -18,6 +18,8 @@
     "dexie": "^3.2.4",
     "element-plus": "^2.3.7",
     "openai": "^3.2.1",
+    "pinia": "^2.1.6",
+    "pinia-plugin-persistedstate": "^3.2.0",
     "unfetch": "^5.0.0",
     "vue": "^3.3.4",
     "vue-class-component": "^8.0.0-0",
