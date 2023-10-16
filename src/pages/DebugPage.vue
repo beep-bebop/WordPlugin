@@ -264,13 +264,13 @@ async function ossUpload (option: any) {
 
 onMounted(async () => {
   choice.value = store.knowledgeid
-  const res = await getKbsList()
-  res.data.data.forEach((item: any) => {
-    items.value.push({
-      value: item,
-      show: false
-    })
-  })
+  // const res = await getKbsList()
+  // res.data.data.forEach((item: any) => {
+  //   items.value.push({
+  //     value: item,
+  //     show: false
+  //   })
+  // })
 })
 const formValue = ref({
   user: {
